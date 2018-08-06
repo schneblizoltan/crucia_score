@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.zoli.cruciascore2.R;
+import com.zoli.cruciascore2.score.decorators.FirstColumnDivider;
+import com.zoli.cruciascore2.score.decorators.FirstLineDivider;
 
 import java.util.ArrayList;
 
@@ -31,27 +33,24 @@ public class TableScoreView extends AppCompatActivity {
 
         int mode = getIntent().getIntExtra("mode", 0);
 
-
         scoreAdapter = new ScoreAdapter(scoreList, mode);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.score_list_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
+        recyclerView.addItemDecoration(new FirstLineDivider(getBaseContext()));
+        recyclerView.addItemDecoration(new FirstColumnDivider(getBaseContext()));
 
         if (mode == 0) {
             scoreList.add(new ListViewItem("","Player1", "Player2", "Double Round", "Type", mode));
             scoreList.add(new ListViewItem("1.","1", "0", "2", "2", mode));
             scoreList.add(new ListViewItem("2.","1", "0", "2", "1", mode));
-            scoreList.add(new ListViewItem("3.","1", "0", "2", "2", mode));
-            scoreList.add(new ListViewItem("4.","1", "0", "2", "3", mode));
             updateRecycleView();
         } else {
             scoreList.add(new ListViewItem("", "Player1", "Player2", "Player3", "Type", mode));
             scoreList.add(new ListViewItem("1.","1", "-1", "2", "2", mode));
             scoreList.add(new ListViewItem("2.","1", "-1", "2", "2", mode));
-            scoreList.add(new ListViewItem("3.","1", "-1", "2", "2", mode));
-            scoreList.add(new ListViewItem("4.","1", "-1", "2", "2", mode));
             updateRecycleView();
         }
 
