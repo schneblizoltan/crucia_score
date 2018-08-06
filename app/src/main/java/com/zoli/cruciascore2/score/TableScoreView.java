@@ -39,8 +39,6 @@ public class TableScoreView extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
 
-
-
         if (mode == 0) {
             scoreList.add(new ListViewItem("","Player1", "Player2", "Double Round", "Type", mode));
             scoreList.add(new ListViewItem("1.","1", "0", "2", "2", mode));
