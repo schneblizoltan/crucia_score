@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Crucia Score</string>
+    <string name="two_player">2 Player</string>
+    <string name="three_player">3 Player</string>
+    <string name="four_player">4 Player</string>
+    <string name="select_diff">Select game mode</string>
+    <string name="action_settings">Settings</string>
+</resources>
