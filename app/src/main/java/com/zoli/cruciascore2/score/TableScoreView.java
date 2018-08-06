@@ -8,9 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.zoli.cruciascore2.R;
@@ -19,8 +16,6 @@ import java.util.ArrayList;
 
 public class TableScoreView extends AppCompatActivity {
 
-    private int mode;
-    private RecyclerView recyclerView;
     private ScoreAdapter scoreAdapter;
     private ArrayList<ListViewItem> scoreList;
 
@@ -34,12 +29,12 @@ public class TableScoreView extends AppCompatActivity {
 
         scoreList = new ArrayList<>();
 
-        mode = getIntent().getIntExtra("mode",0);
+        int mode = getIntent().getIntExtra("mode", 0);
 
 
         scoreAdapter = new ScoreAdapter(scoreList, mode);
 
-        recyclerView = (RecyclerView) findViewById(R.id.score_list_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.score_list_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
@@ -84,7 +79,7 @@ public class TableScoreView extends AppCompatActivity {
     }
 
     private void incRoundTimes() {
-        ListViewItem listViewItem = (ListViewItem) scoreList.get(scoreList.size() - 1);
+        ListViewItem listViewItem = scoreList.get(scoreList.size() - 1);
         listViewItem.setRoundTimes("10");
     }
 

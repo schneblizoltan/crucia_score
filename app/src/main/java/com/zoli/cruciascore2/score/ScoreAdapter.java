@@ -18,7 +18,7 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
     private ArrayList<ListViewItem> scoreList;
     private int mode;
 
-    public ScoreAdapter(ArrayList<ListViewItem> scoreList, int mode) {
+    ScoreAdapter(ArrayList<ListViewItem> scoreList, int mode) {
         this.scoreList = scoreList;
         this.mode = mode;
     }
@@ -33,13 +33,11 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
         } else {
             layoutIdForListItem = R.layout.three_player_row;
         }
-        boolean shouldAttachToParentImmediately = false;
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
-        ScoreViewHolder scoreViewHolder = new ScoreViewHolder(view, scoreList);
+        View view = inflater.inflate(layoutIdForListItem, parent, false);
 
-        return scoreViewHolder;
+        return new ScoreViewHolder(view, scoreList);
     }
 
     @Override
@@ -66,7 +64,7 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
         private ArrayList<ListViewItem> scoreList;
         private TextView textViewRoundNumber, textViewPlayer1, textViewPlayer2, textViewPlayer3, textViewDoubleRound;
 
-        public ScoreViewHolder(View itemView, ArrayList<ListViewItem> scoreList) {
+        ScoreViewHolder(View itemView, ArrayList<ListViewItem> scoreList) {
             super(itemView);
             this.itemView = itemView;
             this.scoreList = scoreList;
@@ -78,7 +76,7 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
             textViewDoubleRound = (TextView) itemView.findViewById(R.id.double_round_indicator);
         }
 
-        public void bind(int position) {
+        void bind(int position) {
             ListViewItem listViewItem = scoreList.get(position);
 
             if(listViewItem.getType() != ScoreAdapter.TWO_PLAYER) {
@@ -87,7 +85,7 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
             }
 
             if(position == 0) {
-                customizeFirstRow(textViewRoundNumber, textViewPlayer1, textViewPlayer2, textViewPlayer3, textViewDoubleRound);
+                customizeFirstRow(textViewRoundNumber);
             }
 
             textViewRoundNumber.setText(listViewItem.getRoundNumber());
@@ -96,9 +94,8 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
             textViewDoubleRound.setText(listViewItem.getRoundTimes());
         }
 
-        private void customizeFirstRow(TextView roundNumber, TextView scoreP1, TextView scoreP2, TextView scoreP3, TextView roundTimes) {
+        private void customizeFirstRow(TextView roundNumber) {
             roundNumber.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemView.getContext().getResources().getDimension(R.dimen.double_round_icon_size));
-            //roundTimes.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         }
 
     }
