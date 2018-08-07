@@ -3,7 +3,7 @@
     android:shape="rectangle">
 
     <size
-        android:width="300dp"
+        android:width="600dp"
         android:height="1dp" />
     <solid android:color="@color/score_divider" />
 </shape>

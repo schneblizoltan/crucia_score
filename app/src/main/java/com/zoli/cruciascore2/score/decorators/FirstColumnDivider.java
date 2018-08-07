@@ -22,7 +22,7 @@ public class FirstColumnDivider extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
 
-        if(parent.getChildCount() > 1) {
+        if(parent.getChildCount() > 0) {
             View child = parent.getChildAt(parent.getChildCount() - 1);
             View child0 = parent.getChildAt(0);
             if(firstChildId == -1) {
@@ -36,7 +36,6 @@ public class FirstColumnDivider extends RecyclerView.ItemDecoration {
             int top = 0;
             int bottom = child.getBottom() + params.bottomMargin;
 
-            Log.d("DIVIDER", left+" "+top+" "+right+" "+bottom);
             divider.setBounds(left, top, right, bottom);
             divider.draw(c);
         }

@@ -1,5 +1,6 @@
 package com.zoli.cruciascore2.score;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -9,11 +10,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zoli.cruciascore2.R;
 import com.zoli.cruciascore2.score.decorators.FirstColumnDivider;
-import com.zoli.cruciascore2.score.decorators.FirstLineDivider;
 
 import java.util.ArrayList;
 
@@ -36,8 +39,8 @@ public class TableScoreView extends AppCompatActivity {
         scoreList = new ArrayList<>();
         scoreAdapter = new ScoreAdapter(scoreList, mode);
 
-       setUpRecyclerView();
-       setUpFirstRow(mode);
+        setUpRecyclerView();
+        setUpFirstRow(mode);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.score_add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -71,27 +74,45 @@ public class TableScoreView extends AppCompatActivity {
 
     private void setUpRecyclerView() {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.score_list_view);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
-        recyclerView.addItemDecoration(new FirstLineDivider(getBaseContext()));
         recyclerView.addItemDecoration(new FirstColumnDivider(getBaseContext()));
     }
 
+    @SuppressLint({"InflateParams", "SetTextI18n"})
     private void setUpFirstRow(int mode) {
+        View row;
+        
         if (mode == 0) {
-            scoreList.add(new ListViewItem("","Player1", "Player2", "", "Type", mode));
-            updateRecycleView();
-        } else {
-            scoreList.add(new ListViewItem("", "Player1", "Player2", "Player3", "Type", mode));
-            updateRecycleView();
-        }
-    }
+            row = getLayoutInflater().inflate(R.layout.two_player_row, null);
 
-    private void incRoundTimes() {
-        ListViewItem listViewItem = scoreList.get(scoreList.size() - 1);
-        listViewItem.setRoundTimes("10");
+            TextView textViewPlayer1 = (TextView) row.findViewById(R.id.score_player1);
+            textViewPlayer1.setText("Player1");
+
+            TextView textViewPlayer2 = (TextView) row.findViewById(R.id.score_player2);
+            textViewPlayer2.setText("Player2");
+
+            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
+            textViewType.setText("Type");
+        } else {
+            row = getLayoutInflater().inflate(R.layout.three_player_row, null);
+
+            TextView textViewPlayer1 = (TextView) row.findViewById(R.id.score_player1);
+            textViewPlayer1.setText("Player1");
+
+            TextView textViewPlayer2 = (TextView) row.findViewById(R.id.score_player2);
+            textViewPlayer2.setText("Player2");
+
+            TextView textViewPlayer3 = (TextView) row.findViewById(R.id.score_player3);
+            textViewPlayer3.setText("Player3");
+
+            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
+            textViewType.setText("Type");
+        }
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_view_header);
+        layout.addView(row, 0);
     }
 
     private void updateRecycleView() {
