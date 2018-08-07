@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -34,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <EditText
         android:id="@+id/score_player1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,14 +43,20 @@
         android:layout_marginTop="8dp"
         android:textColor="@android:color/black"
         android:textSize="@dimen/double_round_icon_size"
+        android:background="@android:color/transparent"
+        android:maxLines="1"
+        android:inputType="textNoSuggestions"
+        android:imeOptions="actionDone"
+        android:cursorVisible="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/score_player2"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/round_number"
         app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="LabelFor" />
 
-    <TextView
+    <EditText
         android:id="@+id/score_player2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,11 +64,17 @@
         android:layout_marginTop="8dp"
         android:textColor="@android:color/black"
         android:textSize="@dimen/double_round_icon_size"
+        android:background="@android:color/transparent"
+        android:maxLines="1"
+        android:inputType="textNoSuggestions"
+        android:imeOptions="actionDone"
+        android:cursorVisible="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/score_player1"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="LabelFor" />
 
     <TextView
         android:id="@+id/double_round_indicator"

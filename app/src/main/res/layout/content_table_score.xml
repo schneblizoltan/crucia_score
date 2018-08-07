@@ -13,6 +13,10 @@
         android:orientation="vertical"
         android:layout_marginTop="8dp"
         android:overScrollMode="never"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:clickable="true"
+        android:descendantFocusability="beforeDescendants"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -20,17 +24,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:contentDescription="@string/score_divider"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
             app:srcCompat="@drawable/score_line_divider"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/score_list_view"
+        <LinearLayout
+            android:descendantFocusability="blocksDescendants"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
-            app:layout_constraintTop_toTopOf="@id/score_divider">
+            app:layout_constraintTop_toTopOf="@id/score_divider" >
 
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/score_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
