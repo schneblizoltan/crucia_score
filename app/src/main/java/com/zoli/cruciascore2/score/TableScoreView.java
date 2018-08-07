@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.zoli.cruciascore2.R;
 import com.zoli.cruciascore2.score.decorators.FirstColumnDivider;
 import com.zoli.cruciascore2.score.decorators.GravityCompoundDrawable;
+import com.zoli.cruciascore2.score.decorators.LastLineDivider;
 
 import java.util.ArrayList;
 
@@ -45,14 +46,19 @@ public class TableScoreView extends AppCompatActivity {
 
         setUpRecyclerView();
         setUpFirstRow(mode);
+        updateRecycleView();
+        setUpLastRow(mode);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.score_add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                scoreList.add(new ListViewItem(Integer.toString(rowCount)+". ","1", "2", "3", "", mode));
-                updateRecycleView();
+                if (scoreList.size() > 0) {
+                    scoreList.remove(scoreList.size() - 1);
+                }
+                scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "1", "2", "3", "", mode));
+                setUpLastRow(mode);
                 rowCount++;
             }
         });
@@ -68,9 +74,16 @@ public class TableScoreView extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            Toast.makeText(this, "Clicked Settings in table", Toast.LENGTH_LONG).show();
-            return true;
+        switch (id) {
+            case R.id.action_settings: {
+                Toast.makeText(this, "Clicked Settings", Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+            case R.id.action_reset: {
+                Toast.makeText(this, "Clicked RESET", Toast.LENGTH_LONG).show();
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -82,6 +95,7 @@ public class TableScoreView extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
         recyclerView.addItemDecoration(new FirstColumnDivider(getBaseContext()));
+        recyclerView.addItemDecoration(new LastLineDivider(getBaseContext()));
         recyclerView.setFocusable(false);
         recyclerView.setFocusableInTouchMode(false);
     }
@@ -130,6 +144,18 @@ public class TableScoreView extends AppCompatActivity {
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_view_header);
         layout.addView(row, 0);
+    }
+
+    private void setUpLastRow(int mode) {
+        int sumP1 = 0, sumP2 = 0, sumP3 = 0;
+
+        for (ListViewItem listViewItem : scoreList) {
+            sumP1 += Integer.valueOf(listViewItem.getScoreP1());
+            sumP2 += Integer.valueOf(listViewItem.getScoreP2());
+            sumP3 += Integer.valueOf(listViewItem.getScoreP3());
+        }
+        scoreList.add(new ListViewItem("Sum", String.valueOf(sumP1), String.valueOf(sumP2), String.valueOf(sumP3), "", mode));
+        updateRecycleView();
     }
 
     private void setTopLeftIcon(TextView textView) {

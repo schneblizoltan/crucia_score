@@ -84,18 +84,10 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
                 textViewPlayer3.setText(listViewItem.getScoreP3());
             }
 
-            if(position == 0) {
-                customizeFirstRow(textViewRoundNumber);
-            }
-
             textViewRoundNumber.setText(listViewItem.getRoundNumber());
             textViewPlayer1.setText(listViewItem.getScoreP1());
             textViewPlayer2.setText(listViewItem.getScoreP2());
             textViewDoubleRound.setText(listViewItem.getRoundTimes());
-        }
-
-        private void customizeFirstRow(TextView roundNumber) {
-            roundNumber.setTextSize(TypedValue.COMPLEX_UNIT_PX, itemView.getContext().getResources().getDimension(R.dimen.double_round_icon_size));
         }
 
     }
