@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.zoli.cruciascore2.R;
 import com.zoli.cruciascore2.score.decorators.FirstColumnDivider;
 import com.zoli.cruciascore2.score.decorators.GravityCompoundDrawable;
-import com.zoli.cruciascore2.score.decorators.LastLineDivider;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -39,6 +38,8 @@ public class TableScoreView extends AppCompatActivity {
     private int rowCount = 1;
     private int mode, roundTimes = 2;
     private RecyclerView recyclerView;
+    private final int TWO_PLAYER_MODE = 0;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,27 +56,33 @@ public class TableScoreView extends AppCompatActivity {
 
         setUpRecyclerView();
         setUpFirstRow(mode);
+        setUpLastRowForFirstUse(mode);
         updateRecycleView();
-        setUpLastRow(mode);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.score_add_fab);
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                if (scoreList.size() > 0) {
-                    scoreList.remove(scoreList.size() - 1);
-                }
                 scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "1", "2", "3", "", mode));
-                setUpLastRow(mode);
+                recyclerView.scrollToPosition(scoreList.size() - 1);
                 rowCount++;
+                setUpLastRow(mode);
+                setUpDoubleRoundIndicator();
             }
         });
+    }
+
+    private void setUpDoubleRoundIndicator() { // After the player starts a new round the indicator should show X2
+        roundTimes = 2;
+        MenuItem menuItem = menu.findItem(R.id.action_double);
+        menuItem.setTitle("Round X"+roundTimes);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_difficulty_selector, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -110,12 +117,11 @@ public class TableScoreView extends AppCompatActivity {
             }
 
             case R.id.action_double: {
-                if (scoreList.size() > 1) {
-                    View view = recyclerView.getLayoutManager().findViewByPosition(scoreList.size() - 2);
-                    scoreList.get(scoreList.size() - 2).setRoundTimes(String.valueOf(roundTimes));
-                    TextView typeTextView = (TextView) view.findViewById(R.id.double_round_indicator);
-                    typeTextView.setText(String.valueOf(roundTimes));
+                if (scoreList.size() > 0) { // We don't need to set the textView manually. The recycler view handles it.
+                    scoreList.get(scoreList.size() - 1).setRoundTimes("X"+String.valueOf(roundTimes));
+                    updateRecycleView();
                     roundTimes++;
+                    item.setTitle("Round X"+roundTimes);
                 } else {
                     Toast.makeText(this, "Not enough rounds played", Toast.LENGTH_SHORT).show();
                 }
@@ -140,7 +146,6 @@ public class TableScoreView extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
         recyclerView.addItemDecoration(new FirstColumnDivider(getBaseContext()));
-        recyclerView.addItemDecoration(new LastLineDivider(getBaseContext()));
         recyclerView.setFocusable(false);
         recyclerView.setFocusableInTouchMode(false);
     }
@@ -149,11 +154,12 @@ public class TableScoreView extends AppCompatActivity {
     private void setUpFirstRow(int mode) {
         View row;
 
-        if (mode == 0) {
+        if (mode == TWO_PLAYER_MODE) {
             row = getLayoutInflater().inflate(R.layout.two_player_row, null);
 
             TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
             textViewType.setText("Type");
+            textViewType.setCompoundDrawables(null, null, null, null);
 
             EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
             editTextPlayer1.setText("Player1");
@@ -197,16 +203,78 @@ public class TableScoreView extends AppCompatActivity {
         layout.addView(row, 0);
     }
 
-    private void setUpLastRow(int mode) {
+    @SuppressLint("InflateParams")
+    private void setUpLastRowForFirstUse(int mode) {    //Sets the sum and 0 scores for the players
+        View row;
+
+        if (mode == TWO_PLAYER_MODE) {
+            row = getLayoutInflater().inflate(R.layout.two_player_row, null);
+
+            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
+            textViewType.setText("");
+
+            TextView textViewRoundNumber = (TextView) row.findViewById(R.id.round_number);
+            textViewRoundNumber.setText(R.string.sum_score_text);
+
+            EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
+            editTextPlayer1.setText("0");
+
+            EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
+            editTextPlayer2.setText("0");
+
+        } else {
+            row = getLayoutInflater().inflate(R.layout.three_player_row, null);
+
+            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
+            textViewType.setText("");
+
+            TextView textViewRoundNumber = (TextView) row.findViewById(R.id.round_number);
+            textViewRoundNumber.setText(R.string.sum_score_text);
+
+            EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
+            editTextPlayer1.setText("0");
+
+            EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
+            editTextPlayer2.setText("0");
+
+            EditText editTextPlayer3 = (EditText) row.findViewById(R.id.score_player3);
+            editTextPlayer3.setText("0");
+        }
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_sum);
+        layout.addView(row, 1);
+    }
+
+    private void setUpLastRow(int mode) {   // Calculates the score for the players and updates the textView
         int sumP1 = 0, sumP2 = 0, sumP3 = 0;
 
         for (ListViewItem listViewItem : scoreList) {
-            sumP1 += Integer.valueOf(listViewItem.getScoreP1());
-            sumP2 += Integer.valueOf(listViewItem.getScoreP2());
-            sumP3 += Integer.valueOf(listViewItem.getScoreP3());
+            if (!listViewItem.getRoundTimes().isEmpty()) {
+                sumP1 += Integer.valueOf(listViewItem.getScoreP1()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+                sumP2 += Integer.valueOf(listViewItem.getScoreP2()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+                sumP3 += Integer.valueOf(listViewItem.getScoreP3()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+            } else {
+                sumP1 += Integer.valueOf(listViewItem.getScoreP1());
+                sumP2 += Integer.valueOf(listViewItem.getScoreP2());
+                sumP3 += Integer.valueOf(listViewItem.getScoreP3());
+            }
         }
-        scoreList.add(new ListViewItem("Sum", String.valueOf(sumP1), String.valueOf(sumP2), String.valueOf(sumP3), "", mode));
+
         updateRecycleView();
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_sum);
+
+        TextView textViewPlayer1 = (TextView) layout.findViewById(R.id.score_player1);
+        textViewPlayer1.setText(String.valueOf(sumP1));
+
+        TextView textViewPlayer2 = (TextView) layout.findViewById(R.id.score_player2);
+        textViewPlayer2.setText(String.valueOf(sumP2));
+
+        if (mode != TWO_PLAYER_MODE) {
+            TextView textViewPlayer3 = (TextView) layout.findViewById(R.id.score_player3);
+            textViewPlayer3.setText(String.valueOf(sumP3));
+        }
+
     }
 
     private void setTopLeftIcon(TextView textView) {

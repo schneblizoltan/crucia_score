@@ -9,40 +9,64 @@
     <LinearLayout
         android:id="@+id/score_list_view_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:overScrollMode="never"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:clickable="true"
         android:descendantFocusability="beforeDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@+id/score_list_sum"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/score_divider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:contentDescription="@string/score_divider"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:clickable="true"
-            app:srcCompat="@drawable/score_line_divider"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/score_line_divider" />
 
         <LinearLayout
-            android:descendantFocusability="blocksDescendants"
+            android:id="@+id/recycler_view_holder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="@id/score_divider" >
+            android:descendantFocusability="blocksDescendants"
+            app:layout_constraintTop_toTopOf="@id/score_divider">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/score_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:overScrollMode="never"/>
-
+                android:overScrollMode="never" />
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/score_list_sum"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        android:descendantFocusability="blocksDescendants"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/sum_score_divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/score_divider"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/score_line_divider" />
 
     </LinearLayout>
 
@@ -50,13 +74,13 @@
         android:id="@+id/score_add_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="12dp"
         android:layout_marginRight="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="12dp"
         android:src="@drawable/ic_add_white_32dp"
         android:scaleType="center"
         android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/score_list_sum"
         app:layout_constraintRight_toRightOf="parent"
         tools:targetApi="lollipop" />
 
