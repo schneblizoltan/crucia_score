@@ -42,6 +42,7 @@ public class TableScoreView extends AppCompatActivity {
     private Menu menu;
     private int WINNER_SCORE = 21;
     private boolean SHOULD_ANNOUNCE_WINNER = true;
+    private boolean SHOWED_DRAW_ALERT = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +67,9 @@ public class TableScoreView extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                //scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "1", "2", "0", "", mode));
-                scoreList.get(scoreList.size() - 1).setScoreP1("1");
+                scoreList.get(scoreList.size() - 1).setScoreP1("2");
                 scoreList.get(scoreList.size() - 1).setScoreP2("2");
-                scoreList.get(scoreList.size() - 1).setScoreP3("3");
+                scoreList.get(scoreList.size() - 1).setScoreP3("2");
                 recyclerView.scrollToPosition(scoreList.size() - 1);
                 rowCount++;
                 setUpLastRow(mode);
@@ -148,6 +148,7 @@ public class TableScoreView extends AppCompatActivity {
         setUpLastRow(mode);
         roundTimes = 2;
         SHOULD_ANNOUNCE_WINNER = true;
+        SHOWED_DRAW_ALERT = false;
     }
 
     private void setUpRecyclerView() {
@@ -172,12 +173,12 @@ public class TableScoreView extends AppCompatActivity {
             textViewType.setCompoundDrawables(null, null, null, null);
 
             EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
-            editTextPlayer1.setText("Player1");
+            editTextPlayer1.setText("Entity1");
             setTopLeftIcon(editTextPlayer1);
             setOnclickAndOnFocusListener(editTextPlayer1, textViewType);
 
             EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
-            editTextPlayer2.setText("Player2");
+            editTextPlayer2.setText("Entity2");
             setTopLeftIcon(editTextPlayer2);
             setOnclickAndOnFocusListener(editTextPlayer2, textViewType);
 
@@ -315,7 +316,10 @@ public class TableScoreView extends AppCompatActivity {
 
             int winner = maxScore(sumP1, sumP2, sumP3);
 
-            if (winner >= WINNER_SCORE && SHOULD_ANNOUNCE_WINNER) {
+            if (((sumP1 == sumP2 && sumP1 > WINNER_SCORE) || (sumP1 == sumP3 && sumP1 > WINNER_SCORE) || (sumP3 == sumP2 && sumP2 > WINNER_SCORE)) && !SHOWED_DRAW_ALERT) {
+                SHOWED_DRAW_ALERT = true;
+                drawAlert();
+            } else if (winner >= WINNER_SCORE && SHOULD_ANNOUNCE_WINNER && differenceIsGood(sumP1, sumP2, sumP3, winner)) {
                 LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
                 if (winner == sumP1) {
@@ -330,10 +334,13 @@ public class TableScoreView extends AppCompatActivity {
                 }
 
             }
-        } else {
-            int winner = maxScore(sumP1, sumP2, Integer.MIN_VALUE);
+        } else { // TWO_PLAYER
+            int winner = sumP1 > sumP2 ? sumP1 : sumP2;
 
-            if (winner >= WINNER_SCORE && SHOULD_ANNOUNCE_WINNER) {
+            if (sumP1 == sumP2 && sumP1 > WINNER_SCORE && !SHOWED_DRAW_ALERT) {
+                SHOWED_DRAW_ALERT = true;
+                drawAlert();
+            } else if ((winner > WINNER_SCORE) && SHOULD_ANNOUNCE_WINNER && (sumP1 != sumP2)) {
                 LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
                 if (winner == sumP1) {
@@ -345,6 +352,26 @@ public class TableScoreView extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private boolean differenceIsGood(int score1, int score2, int score3, int max) { // After there was a draw the winner will only be announced if he has the highest score
+        int counter = 0;                                                            // We will count how many numbers are equal to the max score
+        if (max == score1) counter++;
+        if (max == score2) counter++;
+        if (max == score3) counter++;
+        return SHOWED_DRAW_ALERT && (counter == 1);                                 // If we showed the draw alert and there is only one highest number, then we have a winner
+    }
+
+    private void drawAlert() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.ResetAlertDialog));
+        alertDialogBuilder.setTitle("Draw");
+        alertDialogBuilder.setMessage("To determine the winner 1 point difference is needed!");
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialogBuilder.show();
     }
 
     private void winnerAlert(String name) {
@@ -436,6 +463,5 @@ public class TableScoreView extends AppCompatActivity {
         });
     }
 
-    public void onClick(View view) {
-    }
+    public void onClick(View view) { }
 }
