@@ -17,8 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,18 +70,82 @@ public class TableScoreView extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                scoreList.get(scoreList.size() - 1).setScoreP1("2");
-                scoreList.get(scoreList.size() - 1).setScoreP2("2");
-                scoreList.get(scoreList.size() - 1).setScoreP3("2");
-                recyclerView.scrollToPosition(scoreList.size() - 1);
-                rowCount++;
-                setUpLastRow(mode);
-                setUpDoubleRoundIndicator();
-                scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "", "", "", "", mode));
-                recyclerView.scrollToPosition(scoreList.size() - 1);
-                updateRecycleView();
+                showInputDialog(mode);
             }
         });
+    }
+
+    private void showInputDialog(final int mode) {
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(TableScoreView.this);
+        if (mode == TWO_PLAYER_MODE) {
+            View view = getLayoutInflater().inflate(R.layout.input_score_dialog_two_player, null);
+            TextView textViewTitle = (TextView) view.findViewById(R.id.round_title);
+            textViewTitle.setText("Round " + rowCount + ".");
+
+            TextView textViewPlayer1Name = (TextView) view.findViewById(R.id.player1_score);
+            textViewPlayer1Name.setText(getPlayer1Name());
+
+            TextView textViewPlayer2Name = (TextView) view.findViewById(R.id.player2_score);
+            textViewPlayer2Name.setText(getPlayer2Name());
+
+            alertDialogBuilder.setView(view);
+            final AlertDialog alert = alertDialogBuilder.show();
+
+            ArrayList<Integer> entries = new ArrayList<>();
+            for (int i = -5; i < 7; i++) {
+                entries.add(i);
+            }
+
+            final Spinner spinnerP1 = (Spinner) view.findViewById(R.id.spinner_player1);
+            final Spinner spinnerP2 = (Spinner) view.findViewById(R.id.spinner_player2);
+            ArrayAdapter<Integer> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, entries);
+            adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
+
+            spinnerP1.setAdapter(adapter);
+            spinnerP1.setSelection(5);
+
+            spinnerP2.setAdapter(adapter);
+            spinnerP2.setSelection(5);
+
+            Button buttonAdd = (Button) view.findViewById(R.id.finish_button);
+            buttonAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    scoreList.get(scoreList.size() - 1).setScoreP1(spinnerP1.getSelectedItem().toString());
+                    scoreList.get(scoreList.size() - 1).setScoreP2(spinnerP2.getSelectedItem().toString());
+                    scoreList.get(scoreList.size() - 1).setScoreP3("0");
+                    recyclerView.scrollToPosition(scoreList.size() - 1);
+                    rowCount++;
+                    setUpLastRow(mode);
+                    setUpDoubleRoundIndicator();
+                    scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "", "", "", "", mode));
+                    recyclerView.scrollToPosition(scoreList.size() - 1);
+                    updateRecycleView();
+                    alert.dismiss();
+                }
+            });
+
+
+
+
+        } else {
+            View view = getLayoutInflater().inflate(R.layout.input_score_dialog_two_player, null);
+        }
+
+    }
+
+    private String getPlayer1Name() {
+        LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
+
+        TextView textView = (TextView) headerLayout.findViewById(R.id.score_player1);
+        return String.valueOf(textView.getText());
+    }
+
+    private String getPlayer2Name() {
+        LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
+
+        TextView textView = (TextView) headerLayout.findViewById(R.id.score_player2);
+        return String.valueOf(textView.getText());
     }
 
     private void setUpDoubleRoundIndicator() { // After the player starts a new round the indicator should show X2
