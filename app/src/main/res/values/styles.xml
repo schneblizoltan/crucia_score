@@ -30,4 +30,8 @@
         <item name="android:textSize">15sp</item>
     </style>
 
+    <style name="ResetAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent" tools:targetApi="lollipop">@color/navBarBackground</item>
+    </style>
+
 </resources>

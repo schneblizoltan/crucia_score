@@ -34,7 +34,6 @@ public class LastLineDivider extends RecyclerView.ItemDecoration {
             int top = child.getTop() + params.topMargin;
             int bottom = top + divider.getIntrinsicHeight();
 
-            Log.d("ASD",textView.getText()+"");
             divider.setBounds(left, top, right, bottom);
             if(textView.getText().equals("Sum")) {
                 divider.draw(c);

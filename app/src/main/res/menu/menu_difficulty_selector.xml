@@ -1,13 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
     <item
-        android:id="@+id/action_reset"
+        android:id="@+id/action_double"
         android:orderInCategory="1"
+        android:title="@string/action_double"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_reset"
+        android:orderInCategory="12"
         android:title="@string/action_reset"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:title="@string/action_settings"
         app:showAsAction="never" />
 </menu>

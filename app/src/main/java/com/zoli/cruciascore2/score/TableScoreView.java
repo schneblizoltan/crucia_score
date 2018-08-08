@@ -2,6 +2,8 @@ package com.zoli.cruciascore2.score;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +27,9 @@ import com.zoli.cruciascore2.score.decorators.FirstColumnDivider;
 import com.zoli.cruciascore2.score.decorators.GravityCompoundDrawable;
 import com.zoli.cruciascore2.score.decorators.LastLineDivider;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
 import java.util.ArrayList;
 
 public class TableScoreView extends AppCompatActivity {
@@ -30,6 +37,8 @@ public class TableScoreView extends AppCompatActivity {
     private ScoreAdapter scoreAdapter;
     private ArrayList<ListViewItem> scoreList;
     private int rowCount = 1;
+    private int mode, roundTimes = 2;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +48,7 @@ public class TableScoreView extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final int mode = getIntent().getIntExtra("mode", 0);
+        mode = getIntent().getIntExtra("mode", 0);
 
         scoreList = new ArrayList<>();
         scoreAdapter = new ScoreAdapter(scoreList, mode);
@@ -81,7 +90,36 @@ public class TableScoreView extends AppCompatActivity {
             }
 
             case R.id.action_reset: {
-                Toast.makeText(this, "Clicked RESET", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.ResetAlertDialog));
+                alertDialogBuilder.setTitle("Reset");
+                alertDialogBuilder.setMessage("Reset the Game?");
+                alertDialogBuilder.setCancelable(false);
+                alertDialogBuilder.setPositiveButton("RESET", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       resetGame();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Nothing to do here
+                    }
+                });
+                alertDialogBuilder.show();
+
+                return true;
+            }
+
+            case R.id.action_double: {
+                if (scoreList.size() > 1) {
+                    View view = recyclerView.getLayoutManager().findViewByPosition(scoreList.size() - 2);
+                    scoreList.get(scoreList.size() - 2).setRoundTimes(String.valueOf(roundTimes));
+                    TextView typeTextView = (TextView) view.findViewById(R.id.double_round_indicator);
+                    typeTextView.setText(String.valueOf(roundTimes));
+                    roundTimes++;
+                } else {
+                    Toast.makeText(this, "Not enough rounds played", Toast.LENGTH_SHORT).show();
+                }
+
                 return true;
             }
         }
@@ -89,8 +127,15 @@ public class TableScoreView extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void resetGame() {
+        rowCount = 1;
+        scoreList.clear();
+        setUpLastRow(mode);
+        roundTimes = 2;
+    }
+
     private void setUpRecyclerView() {
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.score_list_view);
+        recyclerView = (RecyclerView) findViewById(R.id.score_list_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(scoreAdapter);
@@ -107,39 +152,45 @@ public class TableScoreView extends AppCompatActivity {
         if (mode == 0) {
             row = getLayoutInflater().inflate(R.layout.two_player_row, null);
 
+            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
+            textViewType.setText("Type");
+
             EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
             editTextPlayer1.setText("Player1");
             setTopLeftIcon(editTextPlayer1);
-            setOnclickAndOnFocusListener(editTextPlayer1);
+            setOnclickAndOnFocusListener(editTextPlayer1, textViewType);
 
             EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
             editTextPlayer2.setText("Player2");
             setTopLeftIcon(editTextPlayer2);
-            setOnclickAndOnFocusListener(editTextPlayer2);
+            setOnclickAndOnFocusListener(editTextPlayer2, textViewType);
 
-            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
-            textViewType.setText("Type");
+
+            keyboardListener(textViewType);
 
         } else {
             row = getLayoutInflater().inflate(R.layout.three_player_row, null);
 
+            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
+            textViewType.setText("Type");
+
             EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
             editTextPlayer1.setText("Player1");
             setTopLeftIcon(editTextPlayer1);
-            setOnclickAndOnFocusListener(editTextPlayer1);
+            setOnclickAndOnFocusListener(editTextPlayer1, textViewType);
 
             EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
             editTextPlayer2.setText("Player2");
             setTopLeftIcon(editTextPlayer2);
-            setOnclickAndOnFocusListener(editTextPlayer2);
+            setOnclickAndOnFocusListener(editTextPlayer2, textViewType);
 
             EditText editTextPlayer3 = (EditText) row.findViewById(R.id.score_player3);
             editTextPlayer3.setText("Player3");
             setTopLeftIcon(editTextPlayer3);
-            setOnclickAndOnFocusListener(editTextPlayer3);
+            setOnclickAndOnFocusListener(editTextPlayer3, textViewType);
 
-            TextView textViewType = (TextView) row.findViewById(R.id.double_round_indicator);
-            textViewType.setText("Type");
+
+            keyboardListener(textViewType);
         }
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_view_header);
@@ -168,7 +219,7 @@ public class TableScoreView extends AppCompatActivity {
         textView.setCompoundDrawables(gravityDrawable, null, null, null);
     }
 
-    private void setOnclickAndOnFocusListener(final EditText editText) {
+    private void setOnclickAndOnFocusListener(final EditText editText, final TextView textView) {
         editText.setFocusableInTouchMode(false);
         editText.setFocusable(false);
         editText.setFocusableInTouchMode(true);
@@ -188,6 +239,9 @@ public class TableScoreView extends AppCompatActivity {
                 } else {
                     if (inputMethodManager != null) {
                         editText.setSelection(0);
+                        textView.requestFocus();
+                        textView.performClick();
+                        textView.performLongClick();
                         inputMethodManager.showSoftInput(v, 0);
                     }
                 }
@@ -198,4 +252,22 @@ public class TableScoreView extends AppCompatActivity {
     private void updateRecycleView() {
         scoreAdapter.setScoreList(scoreList);
     }
+
+    private void keyboardListener(final TextView textView) {
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+                if (!isOpen) {
+                    Log.d("ASD","no");
+                    textView.requestFocus();
+                    textView.performClick();
+                    textView.performLongClick();
+                    onClick(textView);
+
+                }
+            }
+        });
+    }
+
+    public void onClick(View view) { }
 }
