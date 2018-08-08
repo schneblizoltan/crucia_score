@@ -40,6 +40,8 @@ public class TableScoreView extends AppCompatActivity {
     private RecyclerView recyclerView;
     private final int TWO_PLAYER_MODE = 0;
     private Menu menu;
+    private int WINNER_SCORE = 21;
+    private boolean SHOULD_ANNOUNCE_WINNER = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +66,17 @@ public class TableScoreView extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "1", "2", "3", "", mode));
+                //scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "1", "2", "0", "", mode));
+                scoreList.get(scoreList.size() - 1).setScoreP1("1");
+                scoreList.get(scoreList.size() - 1).setScoreP2("2");
+                scoreList.get(scoreList.size() - 1).setScoreP3("3");
                 recyclerView.scrollToPosition(scoreList.size() - 1);
                 rowCount++;
                 setUpLastRow(mode);
                 setUpDoubleRoundIndicator();
+                scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "", "", "", "", mode));
+                recyclerView.scrollToPosition(scoreList.size() - 1);
+                updateRecycleView();
             }
         });
     }
@@ -76,7 +84,7 @@ public class TableScoreView extends AppCompatActivity {
     private void setUpDoubleRoundIndicator() { // After the player starts a new round the indicator should show X2
         roundTimes = 2;
         MenuItem menuItem = menu.findItem(R.id.action_double);
-        menuItem.setTitle("Round X"+roundTimes);
+        menuItem.setTitle("Round X" + roundTimes);
     }
 
     @Override
@@ -97,34 +105,15 @@ public class TableScoreView extends AppCompatActivity {
             }
 
             case R.id.action_reset: {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.ResetAlertDialog));
-                alertDialogBuilder.setTitle("Reset");
-                alertDialogBuilder.setMessage("Reset the Game?");
-                alertDialogBuilder.setCancelable(false);
-                alertDialogBuilder.setPositiveButton("RESET", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                       resetGame();
-                    }
-                });
-                alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Nothing to do here
-                    }
-                });
-                alertDialogBuilder.show();
-
+                showResetAlert();
                 return true;
             }
 
             case R.id.action_double: {
-                if (scoreList.size() > 0) { // We don't need to set the textView manually. The recycler view handles it.
-                    scoreList.get(scoreList.size() - 1).setRoundTimes("X"+String.valueOf(roundTimes));
-                    updateRecycleView();
-                    roundTimes++;
-                    item.setTitle("Round X"+roundTimes);
-                } else {
-                    Toast.makeText(this, "Not enough rounds played", Toast.LENGTH_SHORT).show();
-                }
+                scoreList.get(scoreList.size() - 1).setRoundTimes("X" + String.valueOf(roundTimes));
+                updateRecycleView();
+                roundTimes++;
+                item.setTitle("Round X" + roundTimes);
 
                 return true;
             }
@@ -133,11 +122,32 @@ public class TableScoreView extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void showResetAlert() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.ResetAlertDialog));
+        alertDialogBuilder.setTitle("Reset");
+        alertDialogBuilder.setMessage("Reset the Game?");
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setPositiveButton("RESET", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                resetGame();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // Nothing to do here
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
     private void resetGame() {
         rowCount = 1;
         scoreList.clear();
+        scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "", "", "", "", mode));
+        updateRecycleView();
         setUpLastRow(mode);
         roundTimes = 2;
+        SHOULD_ANNOUNCE_WINNER = true;
     }
 
     private void setUpRecyclerView() {
@@ -201,6 +211,9 @@ public class TableScoreView extends AppCompatActivity {
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_view_header);
         layout.addView(row, 0);
+
+        // set up first score row
+        scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "", "", "", "", mode));
     }
 
     @SuppressLint("InflateParams")
@@ -250,17 +263,43 @@ public class TableScoreView extends AppCompatActivity {
 
         for (ListViewItem listViewItem : scoreList) {
             if (!listViewItem.getRoundTimes().isEmpty()) {
-                sumP1 += Integer.valueOf(listViewItem.getScoreP1()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
-                sumP2 += Integer.valueOf(listViewItem.getScoreP2()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
-                sumP3 += Integer.valueOf(listViewItem.getScoreP3()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+                if (listViewItem.getScoreP1().isEmpty()) {
+                    sumP1 += 0;
+                } else {
+                    sumP1 += Integer.valueOf(listViewItem.getScoreP1()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+                }
+
+                if (listViewItem.getScoreP2().isEmpty()) {
+                    sumP2 += 0;
+                } else {
+                    sumP2 += Integer.valueOf(listViewItem.getScoreP2()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+                }
+
+                if (listViewItem.getScoreP3().isEmpty()) {
+                    sumP3 += 0;
+                } else {
+                    sumP3 += Integer.valueOf(listViewItem.getScoreP3()) * Integer.valueOf(listViewItem.getRoundTimes().substring(1));
+                }
             } else {
-                sumP1 += Integer.valueOf(listViewItem.getScoreP1());
-                sumP2 += Integer.valueOf(listViewItem.getScoreP2());
-                sumP3 += Integer.valueOf(listViewItem.getScoreP3());
+                if (listViewItem.getScoreP1().isEmpty()) {
+                    sumP1 += 0;
+                } else {
+                    sumP1 += Integer.valueOf(listViewItem.getScoreP1());
+                }
+
+                if (listViewItem.getScoreP2().isEmpty()) {
+                    sumP2 += 0;
+                } else {
+                    sumP2 += Integer.valueOf(listViewItem.getScoreP2());
+                }
+
+                if (listViewItem.getScoreP3().isEmpty()) {
+                    sumP3 += 0;
+                } else {
+                    sumP3 += Integer.valueOf(listViewItem.getScoreP3());
+                }
             }
         }
-
-        updateRecycleView();
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.score_list_sum);
 
@@ -273,8 +312,68 @@ public class TableScoreView extends AppCompatActivity {
         if (mode != TWO_PLAYER_MODE) {
             TextView textViewPlayer3 = (TextView) layout.findViewById(R.id.score_player3);
             textViewPlayer3.setText(String.valueOf(sumP3));
+
+            int winner = maxScore(sumP1, sumP2, sumP3);
+
+            if (winner >= WINNER_SCORE && SHOULD_ANNOUNCE_WINNER) {
+                LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
+
+                if (winner == sumP1) {
+                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player1);
+                    winnerAlert(String.valueOf(textView.getText()));
+                } else if (winner == sumP2) {
+                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player2);
+                    winnerAlert(String.valueOf(textView.getText()));
+                } else {
+                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player3);
+                    winnerAlert(String.valueOf(textView.getText()));
+                }
+
+            }
+        } else {
+            int winner = maxScore(sumP1, sumP2, Integer.MIN_VALUE);
+
+            if (winner >= WINNER_SCORE && SHOULD_ANNOUNCE_WINNER) {
+                LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
+
+                if (winner == sumP1) {
+                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player1);
+                    winnerAlert(String.valueOf(textView.getText()));
+                } else {
+                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player2);
+                    winnerAlert(String.valueOf(textView.getText()));
+                }
+            }
+        }
+    }
+
+    private void winnerAlert(String name) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.ResetAlertDialog));
+        alertDialogBuilder.setTitle("Winner");
+        alertDialogBuilder.setMessage("The winner is - " + name);
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setPositiveButton("NEW GAME", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                resetGame();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("CONTINUE", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                SHOULD_ANNOUNCE_WINNER = false;
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
+    private int maxScore(int score1, int score2, int score3) {
+        int max = Math.max(score1, score2);
+        if (max > score2) { //suppose Player1 is max then compare Player1 with Player3 to find winner
+            max = Math.max(score1, score3);
+        } else { //if y is max then compare y with z to find max number
+            max = Math.max(score2, score3);
         }
 
+        return max;
     }
 
     private void setTopLeftIcon(TextView textView) {
@@ -326,7 +425,7 @@ public class TableScoreView extends AppCompatActivity {
             @Override
             public void onVisibilityChanged(boolean isOpen) {
                 if (!isOpen) {
-                    Log.d("ASD","no");
+                    Log.d("ASD", "no");
                     textView.requestFocus();
                     textView.performClick();
                     textView.performLongClick();
@@ -337,5 +436,6 @@ public class TableScoreView extends AppCompatActivity {
         });
     }
 
-    public void onClick(View view) { }
+    public void onClick(View view) {
+    }
 }

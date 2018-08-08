@@ -10,6 +10,7 @@ public class ListViewItem {
         this.scoreP1 = scoreP1;
         this.scoreP2 = scoreP2;
         this.scoreP3 = scoreP3;
+
         this.roundTimes = roundTimes;
         this.type = type;
     }
@@ -22,12 +23,24 @@ public class ListViewItem {
         return scoreP1;
     }
 
+    public void setScoreP1(String scoreP1) {
+        this.scoreP1 = scoreP1;
+    }
+
     public String getScoreP2() {
         return scoreP2;
     }
 
+    public void setScoreP2(String scoreP2) {
+        this.scoreP2 = scoreP2;
+    }
+
     public String getScoreP3() {
         return scoreP3;
+    }
+
+    public void setScoreP3(String scoreP3) {
+        this.scoreP3 = scoreP3;
     }
 
     public String getRoundTimes() {
