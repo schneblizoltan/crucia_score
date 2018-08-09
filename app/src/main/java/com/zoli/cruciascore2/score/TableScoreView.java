@@ -75,10 +75,12 @@ public class TableScoreView extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private void showInputDialog(final int mode) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(TableScoreView.this);
-        if (mode == TWO_PLAYER_MODE) {
-            View view = getLayoutInflater().inflate(R.layout.input_score_dialog_two_player, null);
+
+        if (mode == TWO_PLAYER_MODE) {  // Two player mode
+            @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.input_score_dialog_two_player, null);
             TextView textViewTitle = (TextView) view.findViewById(R.id.round_title);
             textViewTitle.setText("Round " + rowCount + ".");
 
@@ -125,11 +127,61 @@ public class TableScoreView extends AppCompatActivity {
                 }
             });
 
+        } else {    // Three player mode
+            @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.input_score_dialog_three_player, null);
 
+            TextView textViewTitle = (TextView) view.findViewById(R.id.round_title);
+            textViewTitle.setText("Round " + rowCount + ".");
 
+            TextView textViewPlayer1Name = (TextView) view.findViewById(R.id.player1_score);
+            textViewPlayer1Name.setText(getPlayer1Name());
 
-        } else {
-            View view = getLayoutInflater().inflate(R.layout.input_score_dialog_two_player, null);
+            TextView textViewPlayer2Name = (TextView) view.findViewById(R.id.player2_score);
+            textViewPlayer2Name.setText(getPlayer2Name());
+
+            TextView textViewPlayer3Name = (TextView) view.findViewById(R.id.player3_score);
+            textViewPlayer3Name.setText(getPlayer3Name());
+
+            alertDialogBuilder.setView(view);
+            final AlertDialog alert = alertDialogBuilder.show();
+
+            ArrayList<Integer> entries = new ArrayList<>();
+            for (int i = -5; i < 7; i++) {
+                entries.add(i);
+            }
+
+            final Spinner spinnerP1 = (Spinner) view.findViewById(R.id.spinner_player1);
+            final Spinner spinnerP2 = (Spinner) view.findViewById(R.id.spinner_player2);
+            final Spinner spinnerP3 = (Spinner) view.findViewById(R.id.spinner_player3);
+            ArrayAdapter<Integer> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner_item, entries);
+            adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
+
+            spinnerP1.setAdapter(adapter);
+            spinnerP1.setSelection(5);
+
+            spinnerP2.setAdapter(adapter);
+            spinnerP2.setSelection(5);
+
+            spinnerP3.setAdapter(adapter);
+            spinnerP3.setSelection(5);
+
+            Button buttonAdd = (Button) view.findViewById(R.id.finish_button);
+            buttonAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    scoreList.get(scoreList.size() - 1).setScoreP1(spinnerP1.getSelectedItem().toString());
+                    scoreList.get(scoreList.size() - 1).setScoreP2(spinnerP2.getSelectedItem().toString());
+                    scoreList.get(scoreList.size() - 1).setScoreP3(spinnerP3.getSelectedItem().toString());
+                    recyclerView.scrollToPosition(scoreList.size() - 1);
+                    rowCount++;
+                    setUpLastRow(mode);
+                    setUpDoubleRoundIndicator();
+                    scoreList.add(new ListViewItem(Integer.toString(rowCount) + ". ", "", "", "", "", mode));
+                    recyclerView.scrollToPosition(scoreList.size() - 1);
+                    updateRecycleView();
+                    alert.dismiss();
+                }
+            });
         }
 
     }
@@ -138,14 +190,22 @@ public class TableScoreView extends AppCompatActivity {
         LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
         TextView textView = (TextView) headerLayout.findViewById(R.id.score_player1);
-        return String.valueOf(textView.getText());
+
+        return (String.valueOf(textView.getText())).isEmpty() ? String.valueOf(textView.getHint()) : String.valueOf(textView.getText());
     }
 
     private String getPlayer2Name() {
         LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
         TextView textView = (TextView) headerLayout.findViewById(R.id.score_player2);
-        return String.valueOf(textView.getText());
+        return (String.valueOf(textView.getText())).isEmpty() ? String.valueOf(textView.getHint()) : String.valueOf(textView.getText());
+    }
+
+    private String getPlayer3Name() {
+        LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
+
+        TextView textView = (TextView) headerLayout.findViewById(R.id.score_player3);
+        return (String.valueOf(textView.getText())).isEmpty() ? String.valueOf(textView.getHint()) : String.valueOf(textView.getText());
     }
 
     private void setUpDoubleRoundIndicator() { // After the player starts a new round the indicator should show X2
@@ -180,6 +240,9 @@ public class TableScoreView extends AppCompatActivity {
                 scoreList.get(scoreList.size() - 1).setRoundTimes("X" + String.valueOf(roundTimes));
                 updateRecycleView();
                 roundTimes++;
+                if (roundTimes == 5) {
+                    roundTimes = 1;
+                }
                 item.setTitle("Round X" + roundTimes);
 
                 return true;
@@ -240,15 +303,16 @@ public class TableScoreView extends AppCompatActivity {
             textViewType.setCompoundDrawables(null, null, null, null);
 
             EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
-            editTextPlayer1.setText("Entity1");
+            editTextPlayer1.setHint("Entity1");
+            editTextPlayer1.setSelectAllOnFocus(true);
             setTopLeftIcon(editTextPlayer1);
             setOnclickAndOnFocusListener(editTextPlayer1, textViewType);
 
             EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
-            editTextPlayer2.setText("Entity2");
+            editTextPlayer2.setHint("Entity2");
+            editTextPlayer2.setSelectAllOnFocus(true);
             setTopLeftIcon(editTextPlayer2);
             setOnclickAndOnFocusListener(editTextPlayer2, textViewType);
-
 
             keyboardListener(textViewType);
 
@@ -259,20 +323,22 @@ public class TableScoreView extends AppCompatActivity {
             textViewType.setText("Type");
 
             EditText editTextPlayer1 = (EditText) row.findViewById(R.id.score_player1);
-            editTextPlayer1.setText("Player1");
+            editTextPlayer1.setHint("Entity1");
+            editTextPlayer1.setSelectAllOnFocus(true);
             setTopLeftIcon(editTextPlayer1);
             setOnclickAndOnFocusListener(editTextPlayer1, textViewType);
 
             EditText editTextPlayer2 = (EditText) row.findViewById(R.id.score_player2);
-            editTextPlayer2.setText("Player2");
+            editTextPlayer2.setHint("Entity2");
+            editTextPlayer2.setSelectAllOnFocus(true);
             setTopLeftIcon(editTextPlayer2);
             setOnclickAndOnFocusListener(editTextPlayer2, textViewType);
 
             EditText editTextPlayer3 = (EditText) row.findViewById(R.id.score_player3);
-            editTextPlayer3.setText("Player3");
+            editTextPlayer3.setHint("Entity3");
+            editTextPlayer3.setSelectAllOnFocus(true);
             setTopLeftIcon(editTextPlayer3);
             setOnclickAndOnFocusListener(editTextPlayer3, textViewType);
-
 
             keyboardListener(textViewType);
         }
@@ -390,14 +456,11 @@ public class TableScoreView extends AppCompatActivity {
                 LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
                 if (winner == sumP1) {
-                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player1);
-                    winnerAlert(String.valueOf(textView.getText()));
+                    winnerAlert(getPlayer1Name());
                 } else if (winner == sumP2) {
-                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player2);
-                    winnerAlert(String.valueOf(textView.getText()));
+                    winnerAlert(getPlayer2Name());
                 } else {
-                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player3);
-                    winnerAlert(String.valueOf(textView.getText()));
+                    winnerAlert(getPlayer3Name());
                 }
 
             }
@@ -411,11 +474,9 @@ public class TableScoreView extends AppCompatActivity {
                 LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
                 if (winner == sumP1) {
-                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player1);
-                    winnerAlert(String.valueOf(textView.getText()));
+                    winnerAlert(getPlayer1Name());
                 } else {
-                    TextView textView = (TextView) headerLayout.findViewById(R.id.score_player2);
-                    winnerAlert(String.valueOf(textView.getText()));
+                    winnerAlert(getPlayer2Name());
                 }
             }
         }
