@@ -21,8 +21,10 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="DisabledTextStyle" parent="@android:style/Widget.EditText">
-        <item name="android:textColor">@android:color/black</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/navBarBackground</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:background">@android:color/transparent</item>
+
     </style>
 
     <style name="DisabledTextStyleScore" parent="@android:style/Widget.EditText">

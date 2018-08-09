@@ -58,7 +58,7 @@
         android:textSize="@dimen/button_add_text_size"
         android:text="@string/input_dialog_add"
         android:textColor="@android:color/white"
-        android:background="@color/navBarBackground"
+        android:background="@drawable/rounded_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
