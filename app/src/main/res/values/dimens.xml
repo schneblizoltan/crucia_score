@@ -3,4 +3,8 @@
     <dimen name="button_text_size">16sp</dimen>
     <dimen name="double_round_icon_size">17sp</dimen>
     <dimen name="round_number_size">14sp</dimen>
+
+
+    <dimen name="button_add_text_size">20sp</dimen>
+    <dimen name="round_title_size">24sp</dimen>
 </resources>

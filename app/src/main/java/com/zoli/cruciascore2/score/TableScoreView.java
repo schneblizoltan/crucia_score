@@ -82,7 +82,7 @@ public class TableScoreView extends AppCompatActivity {
         if (mode == TWO_PLAYER_MODE) {  // Two player mode
             @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.input_score_dialog_two_player, null);
             TextView textViewTitle = (TextView) view.findViewById(R.id.round_title);
-            textViewTitle.setText("Round " + rowCount + ".");
+            textViewTitle.setText("Round  " + rowCount);
 
             TextView textViewPlayer1Name = (TextView) view.findViewById(R.id.player1_score);
             textViewPlayer1Name.setText(getPlayer1Name());
@@ -131,7 +131,7 @@ public class TableScoreView extends AppCompatActivity {
             @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.input_score_dialog_three_player, null);
 
             TextView textViewTitle = (TextView) view.findViewById(R.id.round_title);
-            textViewTitle.setText("Round " + rowCount + ".");
+            textViewTitle.setText("Round  " + rowCount);
 
             TextView textViewPlayer1Name = (TextView) view.findViewById(R.id.player1_score);
             textViewPlayer1Name.setText(getPlayer1Name());
