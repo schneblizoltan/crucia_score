@@ -226,10 +226,10 @@ public class TableScoreView extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.action_settings: {
-                Toast.makeText(this, "Clicked Settings", Toast.LENGTH_LONG).show();
-                return true;
-            }
+//            case R.id.action_info: {
+//                Toast.makeText(this, "Clicked Settings", Toast.LENGTH_LONG).show();
+//                return true;
+//            }
 
             case R.id.action_reset: {
                 showResetAlert();

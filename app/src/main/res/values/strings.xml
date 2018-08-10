@@ -9,7 +9,7 @@
     <string name="sum_score_text">Sum</string>
 
     <string name="action_reset">Reset</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_info">Info</string>
     <string name="action_double">Round X2</string>
     <string name="input_dialog_add">ADD</string>
 </resources>
