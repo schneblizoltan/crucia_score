@@ -448,12 +448,12 @@ public class TableScoreView extends AppCompatActivity {
             textViewPlayer3.setText(String.valueOf(sumP3));
 
             int winner = maxScore(sumP1, sumP2, sumP3);
+            Log.i("hiba", differenceIsGood(sumP1, sumP2, sumP3, winner)+" "+winner);
 
             if (((sumP1 == sumP2 && sumP1 > WINNER_SCORE) || (sumP1 == sumP3 && sumP1 > WINNER_SCORE) || (sumP3 == sumP2 && sumP2 > WINNER_SCORE)) && !SHOWED_DRAW_ALERT) {
                 SHOWED_DRAW_ALERT = true;
                 drawAlert();
             } else if (winner >= WINNER_SCORE && SHOULD_ANNOUNCE_WINNER && differenceIsGood(sumP1, sumP2, sumP3, winner)) {
-                LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
 
                 if (winner == sumP1) {
                     winnerAlert(getPlayer1Name());
@@ -470,8 +470,7 @@ public class TableScoreView extends AppCompatActivity {
             if (sumP1 == sumP2 && sumP1 > WINNER_SCORE && !SHOWED_DRAW_ALERT) {
                 SHOWED_DRAW_ALERT = true;
                 drawAlert();
-            } else if ((winner > WINNER_SCORE) && SHOULD_ANNOUNCE_WINNER && (sumP1 != sumP2)) {
-                LinearLayout headerLayout = (LinearLayout) findViewById(R.id.score_list_view_header);
+            } else if ((winner >= WINNER_SCORE) && SHOULD_ANNOUNCE_WINNER && (sumP1 != sumP2)) {
 
                 if (winner == sumP1) {
                     winnerAlert(getPlayer1Name());
@@ -487,7 +486,7 @@ public class TableScoreView extends AppCompatActivity {
         if (max == score1) counter++;
         if (max == score2) counter++;
         if (max == score3) counter++;
-        return SHOWED_DRAW_ALERT && (counter == 1);                                 // If we showed the draw alert and there is only one highest number, then we have a winner
+        return !SHOWED_DRAW_ALERT && (counter == 1);                                 // If we showed the draw alert and there is only one highest number, then we have a winner
     }
 
     private void drawAlert() {
